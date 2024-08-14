@@ -1,10 +1,49 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Auth, Chat, Profile } from './pages'
 import PrivateRoute from './routes/PrivateRoute'
 import AuthRoute from './routes/AuthRoute'
+import { useDispatch, useSelector } from 'react-redux'
+import { setUserData ,selectedUserData} from './store/slices/authSlice'
 
 const App = () => {
+  const userData = useSelector(selectedUserData);
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/auth/user-data", {
+          methods: "GET",
+          credentials: "include",
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.user._id) {
+          dispatch(setUserData(data.user));
+        }
+      } catch (error) {
+        dispatch(setUserData(undefined));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!userData) {
+      fetchData();
+    } else {
+      setLoading(false);
+    }
+  }, [userData]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+
+
     return (
       <BrowserRouter>
         <Routes>

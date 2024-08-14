@@ -106,3 +106,25 @@ export const login = async (req, res, next) => {
         return next(error);
     }
 };
+
+export const getUserData = async (req, res, next) => {
+    try {
+        const userId = req.userId;
+    
+        const user = await User.findById(userId).select("-password");
+  
+        if (!user) {
+            return next(errorHandler(404, "User not found."));
+        }
+  
+        user.id = userId;
+  
+        return res.status(200).json({
+            succes: true,
+            message: "success get data",
+            user,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
