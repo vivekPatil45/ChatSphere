@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import { setUserData } from '@/store/slices/authSlice';
 
 
 const Auth = () => {
@@ -16,7 +18,7 @@ const Auth = () => {
     const [confirmPassword, setConfirmPasswod] = useState("");
     const [activeTab, setActiveTab] = useState("Login");
     const [loading, setLoading] = useState(false);
-
+    const dispatch = useDispatch();
 
     const handleLogin = async () => {
         setLoading(true);
@@ -37,6 +39,7 @@ const Auth = () => {
             }
     
             if (data.user && data.user._id) {
+                dispatch(setUserData(data.user));
                 data.user.profileSetup ? navigate("/chat") : navigate("/profile");
             }
         } catch (error) {
@@ -65,8 +68,9 @@ const Auth = () => {
                 // Display the actual error message
                 toast.error(data.message || "Signup failed");
             } else {
+                dispatch(setUserData(data.user));
                 navigate("/profile");
-                window.location.reload();
+                // window.location.reload();
             }
         } catch (error) {
             toast.error(error.message || "An unexpected error occurred");
@@ -77,7 +81,7 @@ const Auth = () => {
 
 
     return (
-        <div className='  h-[100vh] w-[100vw]  flex items-center justify-center'>
+        <div className='h-[100vh] w-[100vw]  flex items-center justify-center'>
             <div className="min-h-[65vh] md:min-h-[70vh] bg-white border-2 border-white text-opacity-90 shadow-2xl w-[80vw] md:w-[90vw] lg:w-[70vw] xl:w-[60vw] rounded-xl sm:rounded-2xl lg:rounded-3xl grid md:grid-cols-2">
                 
                 <div className="flex flex-col gap-10 items-center justify-center w-full">
