@@ -4,20 +4,76 @@ import victory from "../assets/victory.svg";
 import { Tabs, TabsList,TabsContent,TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 
 
 const Auth = () => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPasswod] = useState("");
     const [activeTab, setActiveTab] = useState("Login");
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = async ()=>{
 
-    }
-    const handleSignUp = async ()=>{
-        
-    }
+    const handleLogin = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password }),
+            });
+    
+            const data = await res.json();
+    
+            if (!res.ok) {
+                // Display the actual error message
+                toast.error(data.message || "Login failed");
+            }
+    
+            if (data.user && data.user._id) {
+                data.user.profileSetup ? navigate("/chat") : navigate("/profile");
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message || "An unexpected error occurred");
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    const handleSignUp = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch("/api/auth/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({ email, password, confirmPassword }),
+            });
+    
+            const data = await res.json();
+    
+            if (!res.ok) {
+                // Display the actual error message
+                toast.error(data.message || "Signup failed");
+            } else {
+                navigate("/profile");
+                window.location.reload();
+            }
+        } catch (error) {
+            toast.error(error.message || "An unexpected error occurred");
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
     return (
@@ -43,12 +99,14 @@ const Auth = () => {
                                 <TabsTrigger
                                     value="Login"
                                     className="data-[state=active]:bg-transparent text-black text-opacity-90 border-b-2 rounded-none  data-[state=active]:text-black data-[state=active]:font-semibold data-[state=active]:border-b-purple-500 p-3 transition-all duration-300 w-full"
+                                    disabled = {loading}
                                 >
                                     Login
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="SignUp"
                                     className="data-[state=active]:bg-transparent text-black text-opacity-90 border-b-2 rounded-none  data-[state=active]:text-black data-[state=active]:font-semibold data-[state=active]:border-b-purple-500 p-3 transition-all duration-300 w-full"
+                                    disabled = {loading}
                                 >
                                     Signup
                                 </TabsTrigger>
@@ -75,8 +133,16 @@ const Auth = () => {
                                         "rounded-full p-4 text-sm disabled:bg-primary/100"
                                         }
                                         onClick={handleLogin}
+                                        disabled={loading}
                                     >
-                                        Login
+                                        {loading ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Please wait
+                                            </>
+                                            ) : (
+                                            "Login"
+                                            )}
                                     </Button>
                                 </div>
                             </TabsContent>
@@ -109,8 +175,16 @@ const Auth = () => {
                                         "rounded-full p-4 text-xs disabled:bg-primary/90"
                                         }
                                         onClick={handleSignUp}
+                                        disabled={loading}
                                     >
-                                        Sign Up
+                                        {loading ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Please wait
+                                            </>
+                                            ) : (
+                                            "Sign Up"
+                                        )}
                                     </Button>
                                 </div>
                             </TabsContent>
