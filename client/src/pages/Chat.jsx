@@ -1,3 +1,6 @@
+import ChatLayout from '@/components/layouts/ChatLayout';
+import ContactLayout from '@/components/layouts/ContactLayout';
+import EmptyChatLayout from '@/components/layouts/EmptyChatLayout';
 import { selectedUserData } from '@/store/slices/authSlice.js'
 import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
@@ -16,9 +19,12 @@ const Chat = () => {
     },[userData])
 
     return (
-        <div>
-            Chat
-        </div>
+        <main className='flex h-screen text-white overflow-hidden'>
+            <ContactLayout/>
+            <EmptyChatLayout/>
+            <ChatLayout/>
+            
+        </main>
     )
 }
 
