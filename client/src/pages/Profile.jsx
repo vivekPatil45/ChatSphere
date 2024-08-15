@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { colors, getColor } from '@/lib/utils';
 import { selectedUserData, setUserData } from '@/store/slices/authSlice';
 import { ChevronLeft, Plus, Trash } from 'lucide-react';
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -24,10 +24,30 @@ const Profile = () => {
     const [loading, setLoading] = useState(false);
     const fileInputRef  = useRef();
 
+    useEffect(() => {
+        if (userData.profileSetup) {
+            setForm({
+                ...form,
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+            });
+            setSelectedColor(userData.color);
+        }
+    
+        if (userData.image) {
+            setForm({
+                ...form,
+                image: userData.image,
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+            });
+        }
+    }, [userData]);
+
     const handleSaveChange = async () =>{
         setLoading(true);
         try {
-            const res = await fetch(HOST + "/api/auth/update-profile", {
+            const res = await fetch("/api/auth/update-profile", {
                 method: "POST",
                 headers: {
                 "Content-Type": "application/json",

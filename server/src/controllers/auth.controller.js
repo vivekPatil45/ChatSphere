@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import dotenv from 'dotenv';
 import { validate } from "../validations/validation.js";
-import { signInValidate, signUpValidate } from "../validations/authValidation.js";
+import { signInValidate, signUpValidate, updateProvileValidate } from "../validations/authValidation.js";
 import { compare } from "bcrypt";
 import { errorHandler } from "../utils/error.js";
 import cloudinary from 'cloudinary';
@@ -179,5 +179,55 @@ export const addProfileImage = async (req, res, next) => {
     } catch (error) {
         console.error("Upload error:", error);
         return next(error);
+    }
+};
+
+
+export const updateProfile = async (req, res, next) => {
+    try {
+        const { userId } = req;
+        const { firstName, lastName, color } = req.body;
+    
+        validate(updateProvileValidate, req.body);
+    
+        const user = await User.findByIdAndUpdate(
+            userId,
+            {
+                firstName,
+                lastName,
+                color,
+                profileSetup: true,
+            },
+            { new: true, runValidators: true }
+        );
+    
+        res
+            .status(200)
+            .json({ success: true, message: "Successfuly save changes", user });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+export const removeProfileImage = async (req, res, next) => {
+    try {
+        const { userId } = req;
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return  next(errorHandler(404, "User is not found"));
+        }
+  
+        user.image = null;
+  
+        await user.save();
+  
+        res
+            .status(200)
+            .json({ success: true, message: "Successfully remove image" });
+    } catch (error) {
+        next(error);
     }
 };
