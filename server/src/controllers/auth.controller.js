@@ -5,8 +5,18 @@ import { validate } from "../validations/validation.js";
 import { signInValidate, signUpValidate } from "../validations/authValidation.js";
 import { compare } from "bcrypt";
 import { errorHandler } from "../utils/error.js";
+import cloudinary from 'cloudinary';
+import { resizeImage } from "../utils/resizeImage.js";
+import fs from 'fs';
 
 dotenv.config();
+
+// Cloudinary configuration
+cloudinary.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const maxAge = 24 * 60 * 60 * 1000;
 
@@ -28,7 +38,7 @@ export const signup = async (req, res, next) => {
         const alreadyExist = await User.findOne({ email });
 
         if (alreadyExist) {
-            return next(errorHandler(400, "Email has been taken")); // Use return to prevent further code execution
+            return next(errorHandler(400, "Email has been taken"));
         }
 
         const newUser = new User({ email, password });
@@ -63,13 +73,13 @@ export const login = async (req, res, next) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return next(errorHandler(404, "User not found")); // Use return to prevent further code execution
+            return next(errorHandler(404, "User not found"));
         }
 
         const isMatch = await compare(password, user.password);
 
         if (!isMatch) {
-            return next(errorHandler(400, "Invalid password")); // Use return to prevent further code execution
+            return next(errorHandler(400, "Invalid password"));
         }
   
         res.cookie("jwt", createToken(email, user.id), {
@@ -117,15 +127,57 @@ export const getUserData = async (req, res, next) => {
             return next(errorHandler(404, "User not found."));
         }
         
-  
         user.id = userId;
         const { password, ...rest } = user._doc;
         return res.status(200).json({
-            succes: true,
+            success: true,
             message: "success get data",
-            user:rest,
+            user: rest,
         });
     } catch (error) {
         next(error);
+    }
+};
+
+export const addProfileImage = async (req, res, next) => {
+    if (!req.file) {
+        return next(errorHandler(400, "File is required."));
+    }
+
+    const file = req.file;
+    const filePath = file.path;
+
+    try {
+        // Resize the image
+        console.log('Original file path:', filePath); // Debug log
+        const resizedFilePath = await resizeImage(filePath);
+        console.log('Resized file path:', resizedFilePath); // Debug log
+
+
+        // Upload to Cloudinary
+        const result = await cloudinary.v2.uploader.upload(resizedFilePath, {
+            folder: 'profiles',
+            public_id: `profile_${Date.now()}`,
+            resource_type: 'image',
+        });
+
+        const userUpdate = await User.findByIdAndUpdate(
+            req.userId,
+            { image: result.secure_url },
+            { new: true, runValidators: true }
+        );
+
+        // Clean up local files
+        fs.unlinkSync(filePath);
+        fs.unlinkSync(resizedFilePath);
+
+        return res.status(200).json({
+            success: true,
+            message: "Successfully uploaded profile image",
+            image: userUpdate.image,
+        });
+    } catch (error) {
+        console.error("Upload error:", error);
+        return next(error);
     }
 };

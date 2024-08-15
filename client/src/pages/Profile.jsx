@@ -2,7 +2,7 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { colors, getColor } from '@/lib/utils';
-import { selectedUserData } from '@/store/slices/authSlice';
+import { selectedUserData, setUserData } from '@/store/slices/authSlice';
 import { ChevronLeft, Plus, Trash } from 'lucide-react';
 import React, { useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,13 +25,80 @@ const Profile = () => {
     const fileInputRef  = useRef();
 
     const handleSaveChange = async () =>{
-
-    }
+        setLoading(true);
+        try {
+            const res = await fetch(HOST + "/api/auth/update-profile", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ ...form, color: selectedColor }),
+                credentials: "include",
+            });
+    
+            const data = await res.json();
+    
+            if (!res.ok) {
+                throw new Error(data.errors);
+            } else {
+                dispatch(setUserData(data.user));
+                toast.success(data.message);
+        
+                navigate("/chat");
+            }
+        } catch (error) {
+            toast.error(error.message);
+            console.log(error);
+            
+        } finally {
+            setLoading(false);
+        }
+    };
     const handleImageChange = async (e) => {
+        const file = e.target.files[0];
+        setLoading(true);
+        if (file) {
+            const formData = new FormData();
 
+            formData.append("profile-image", file);
+
+            try {
+                const res = await fetch("/api/auth/add-profile-image", {
+                    method: "POST",
+                    body: formData,
+                    credentials: "include",
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.image) {
+                dispatch(setUserData({ ...userData, image: data.image }));
+                }
+                e.target.value = null;
+            } catch (error) {
+                toast.error(error.message);
+            } finally {
+                setLoading(false);
+            }
+        }
     }
-    const handleDeleteImage = async () =>{
 
+    const handleDeleteImage = async () =>{
+        setLoading(true);
+        try {
+            const res = await fetch("/api/auth/remove-profile-image", {
+                method: "DELETE",
+                credentials: "include",
+            });
+
+            if (res.ok) {
+                setForm({ ...form, image: "" });
+            }
+        } catch (error) {
+            toast.error(error.message);
+        } finally {
+            setLoading(false);
+        }
     }
 
 

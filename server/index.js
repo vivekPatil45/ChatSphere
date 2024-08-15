@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import authRoutes from "./src/routes/auth.routes.js";
+import { cloudinaryConnect } from "./src/utils/cloudinary.js";
 
 
 dotenv.config();
@@ -35,6 +36,8 @@ app.use((err, req, res, next) => {
     });
 });
 
+
+// cloudinaryConnect();
 
 const connectDB = async () => {
     try {
