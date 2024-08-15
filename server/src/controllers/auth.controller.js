@@ -116,13 +116,14 @@ export const getUserData = async (req, res, next) => {
         if (!user) {
             return next(errorHandler(404, "User not found."));
         }
+        
   
         user.id = userId;
-  
+        const { password, ...rest } = user._doc;
         return res.status(200).json({
             succes: true,
             message: "success get data",
-            user,
+            user:rest,
         });
     } catch (error) {
         next(error);
