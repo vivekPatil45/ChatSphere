@@ -231,3 +231,20 @@ export const removeProfileImage = async (req, res, next) => {
         next(error);
     }
 };
+
+
+
+export const logout = async (req, res, next) => {
+    try {
+        res.cookie("jwt", "", {
+            maxAge: 1,
+            secure: true,
+            sameSite: "None",
+        });
+  
+        res.status(200).json({ success: true, message: "Succsesfully logout." });
+    } catch (error) {
+        next(error);
+    }
+  };
+  

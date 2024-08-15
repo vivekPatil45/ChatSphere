@@ -1,6 +1,6 @@
-import { selectedUserData } from '@/store/slices/authSlice';
+import { selectedUserData, setUserData } from '@/store/slices/authSlice';
 import React from 'react'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarImage } from '../ui/avatar';
 import { getColor } from '@/lib/utils';
@@ -9,6 +9,7 @@ import { CirclePower, EditIcon } from 'lucide-react';
 
 const ProfileInfo = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const userData = useSelector(selectedUserData);
 
     const split = () => {
@@ -23,7 +24,24 @@ const ProfileInfo = () => {
         return result.join("");
     };
 
-    const handleLogout = () => {};
+    const handleLogout = async () => {
+        try {
+            const res = await fetch("/api/auth/logout", {
+                method: "POST",
+                credentials: "include",
+            });
+      
+            if (res.ok) {
+                // dispatch(setOnlineStatus({}));
+                dispatch(setUserData(undefined));
+        
+                navigate("/auth");
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
+
     return (
         <div className="absolute bottom-0 h-16 flex items-center justify-between px-4 w-full bg-[#2a2b33]">
             <div className="flex gap-3 items-center justify-center">

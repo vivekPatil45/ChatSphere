@@ -1,5 +1,5 @@
 import express from "express";
-import { addProfileImage, getUserData, login, signup, updateProfile,removeProfileImage } from "../controllers/auth.controller.js";
+import { addProfileImage, getUserData, login, signup, updateProfile,removeProfileImage ,logout} from "../controllers/auth.controller.js";
 import { verifyToken } from "../middlewares/auth.middleware.js";
 import { upload } from "../utils/multer.js";
 
@@ -17,6 +17,7 @@ authRoutes.post(
     addProfileImage
 );
 authRoutes.delete("/remove-profile-image", verifyToken, removeProfileImage);
+authRoutes.post("/logout", logout);
 
 
 export default authRoutes;
