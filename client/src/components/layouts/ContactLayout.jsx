@@ -16,7 +16,9 @@ const ContactLayout = () => {
             </div>
 
             <div className='my-5'>
-
+                <div className="flex-between pr-10">
+                    <Title text="Channel" />
+                </div>
             </div>
         </div>
     )

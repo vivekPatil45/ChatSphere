@@ -17,6 +17,7 @@
     "@reduxjs/toolkit": "^2.2.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "emoji-picker-react": "^4.11.1",
     "lucide-react": "^0.427.0",
     "next-themes": "^0.3.0",
     "react": "^18.3.1",
