@@ -44,7 +44,7 @@ export const signup = async (req, res, next) => {
         const newUser = new User({ email, password });
 
         const user = await newUser.save();
-        res.cookie("jwt", createToken(email, user.id), {
+        res.cookie("jwt", createToken(email, user._id), {
             maxAge,
             httpOnly: true,
             secure: true,
@@ -53,7 +53,7 @@ export const signup = async (req, res, next) => {
 
         return res.status(201).json({
             user: {
-                _id: user.id,
+                _id: user._id,
                 email: user.email,
                 profileSetup: user.profileSetup,
             },
@@ -82,7 +82,7 @@ export const login = async (req, res, next) => {
             return next(errorHandler(400, "Invalid password"));
         }
   
-        res.cookie("jwt", createToken(email, user.id), {
+        res.cookie("jwt", createToken(email, user._id), {
             maxAge: maxAge,
             httpOnly: true,
             secure: true,
@@ -200,10 +200,11 @@ export const updateProfile = async (req, res, next) => {
             },
             { new: true, runValidators: true }
         );
+        const { password, ...rest } = user._doc;
     
         res
             .status(200)
-            .json({ success: true, message: "Successfuly save changes", user });
+            .json({ success: true, message: "Successfuly save changes", user:rest });
     } catch (error) {
         next(error);
     }

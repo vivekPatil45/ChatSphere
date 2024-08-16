@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import authRoutes from "./src/routes/auth.routes.js";
 import contactsRoutes from "./src/routes/contact.routes.js";
+import setupSocket from "./socket.js";
 
 
 dotenv.config();
@@ -48,8 +49,10 @@ const connectDB = async () => {
     }
 };
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     connectDB();
 
     console.log("Server is running in port " + PORT);
 });
+
+setupSocket(server);
