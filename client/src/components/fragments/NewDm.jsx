@@ -21,6 +21,8 @@ import { animationDefaultOption, getColor } from "@/lib/utils";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { toast } from "sonner";
 import { ScrollArea } from "../ui/scroll-area";
+import { useDispatch } from "react-redux";
+import { setChatData, setChatType } from "@/store/slices/chatSlice";
 
 export const splitName = (firstName, lastName) => {
     const result = [];
@@ -35,6 +37,7 @@ export const splitName = (firstName, lastName) => {
 };
 
 const NewDm = () => {
+    const dispatch = useDispatch();
 
     const [openNewContactModal, setOpenNewContactModal] = useState(false);
     const [search, setSearch] = useState("");
@@ -72,6 +75,14 @@ const NewDm = () => {
             setSearchedContacts([]);
         }
     },[search])
+
+    const selectNewContact = (contact) => {
+        setOpenNewContactModal(false);
+        dispatch(setChatType("contact"));
+        dispatch(setChatData(contact));
+        setSearch("");
+        setSearchedContacts([]);
+    };
 
     return (
         <>
