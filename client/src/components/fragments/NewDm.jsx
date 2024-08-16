@@ -14,11 +14,25 @@ import {
     ResponsiveModalTitle,
 } from '../ui/responsive-modal'
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
-import Lottie from "react-lottie";
-import { animationDefaultOption } from "@/lib/utils";
+import Lottie2 from "react-lottie";
+import { animationDefaultOption, getColor } from "@/lib/utils";
 import { Avatar, AvatarImage } from "../ui/avatar";
+import { toast } from "sonner";
+import { ScrollArea } from "../ui/scroll-area";
+
+export const splitName = (firstName, lastName) => {
+    const result = [];
+  
+    const first = firstName.split("").shift();
+    const last = lastName.split("").shift();
+  
+    result.push(first);
+    result.push(last);
+  
+    return result.join("");
+};
 
 const NewDm = () => {
 
@@ -29,6 +43,35 @@ const NewDm = () => {
     const handleSearch = async (e) => {
         setSearch(e.target.value);
     };
+
+    useEffect(()=>{
+        const fetchData = async () => {
+            try {
+                const res = await fetch("/api/contacts/search", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ search }),
+                    credentials: "include",
+                });
+                const data = await res.json();
+        
+                if (!res.ok) {
+                    throw new Error(data.errors);
+                } else {
+                    setSearchedContacts(data.contact);
+                }
+            } catch (error) {
+                toast.error(error.message);
+            }
+        };
+        if (search.length > 0) {
+            fetchData();
+        } else {
+            setSearchedContacts([]);
+        }
+    },[search])
 
     return (
         <>
@@ -73,7 +116,7 @@ const NewDm = () => {
                     {searchedContacts.length <= 0 ? (
                         <div>
                             <div className="flex-1 flex flex-col mt-5 justify-center items-center  duration-1000 transition-all">
-                                <Lottie
+                                <Lottie2
                                     isClickToPauseDisabled={true}
                                     height={100}
                                     width={100}

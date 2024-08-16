@@ -16,7 +16,7 @@ const Chat = () => {
             toast.error("Please setup profile to continue.");
             navigate("/profile")
         }
-    },[userData])
+    },[userData,navigate])
 
     return (
         <main className="flex h-screen text-white overflow-hidden">
