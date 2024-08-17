@@ -10,11 +10,15 @@ const authSlice = createSlice({
     reducers:{
         setUserData: (state,action) => {
             state.userData = action.payload;
-        }
+        },
+        updateUserData: (state, action) => {
+            state.userData = { ...state.userData, status: action.payload };
+        },
     }
 })
 export const {
-setUserData
+    setUserData,
+    updateUserData
 } = authSlice.actions;
 
 export const selectedUserData = (state) => state.auth.userData;

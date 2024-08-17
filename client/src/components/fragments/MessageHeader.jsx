@@ -51,6 +51,9 @@ const MessageHeader = () => {
                                     ? `${chatData.firstName} ${chatData.lastName}`
                                     : chatData.email}
                                 </span>
+                                <span className="text-xs">
+                                    {chatData.status === false ? "Offline" : "Online"}
+                                </span>
                                 {/* <span className="text-xs mt-1">
                                     {onlineUsers[chatData._id] ? (
                                         <span className="tracking-wide">Online</span>

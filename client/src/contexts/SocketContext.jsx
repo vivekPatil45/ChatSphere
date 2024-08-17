@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { io } from "socket.io-client";
 import Cookie from "js-cookie";
 import { selectedUserData } from "@/store/slices/authSlice";
+import { addMessage, selectedChatData, selectedChatMessage, selectedChatType } from "@/store/slices/chatSlice";
 
 const HOST = "http://localhost:3000";
 const SocketContext = createContext(null);
@@ -10,13 +11,17 @@ const SocketContext = createContext(null);
 export const useSocket = () => useContext(SocketContext);
 
 const SocketProvider = ({ children }) => {
+
   const socket = useRef();
   const userData = useSelector(selectedUserData);
+  const chatData = useSelector(selectedChatData);
+  const chatMessage = useSelector(selectedChatType);
+  const chatType = useSelector(selectedChatMessage);
   const dispatch = useDispatch();
   const cookie = Cookie.get("jwt");
 
   useEffect(() => {
-    if (userData?._id) {
+    if (userData) {
       socket.current = io(HOST, {
         withCredentials: true,
         query: { userId: userData._id },
@@ -35,6 +40,29 @@ const SocketProvider = ({ children }) => {
     }
   }, [userData, cookie]);
 
+  useEffect(()=>{
+    if(chatData){
+      const handleMessage = (message) => {
+        if (
+          chatType !== undefined &&
+          (chatData._id === message.sender._id ||
+            chatData._id === message.recipient._id)
+        ) {
+          dispatch(addMessage(message));
+        }
+        // dispatch(addContactInDmContactList({ userId: userData._id, message }));
+
+      };
+      
+      socket.current.on("receiveMessage", handleMessage);
+      return () => {
+        socket.current.off("receiveMessage", handleMessage);
+        
+      };
+    }
+
+
+  },[chatData,chatType,chatMessage])
   return (
     <SocketContext.Provider value={socket.current}>
       {children}

@@ -1,12 +1,21 @@
+import { useSocket } from "@/contexts/SocketContext";
+import { selectedUserData } from "@/store/slices/authSlice";
+import { selectedChatData, selectedChatType } from "@/store/slices/chatSlice";
 import EmojiPicker from "emoji-picker-react";
 import { Paperclip, SendHorizonal, Sticker } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const MessageBar = () => {
-    const emojiRef = useRef();
+    const emojiRef = useRef(null);
+    const dispatch = useDispatch();
 
     const [message, setMessage] = useState("");
     const [isEmojiPicker, setIsEmojiPicker] = useState(false);
+    const chatData = useSelector(selectedChatData);
+    const chatType = useSelector(selectedChatType);
+    const userData = useSelector(selectedUserData);
+    const socket = useSocket();
 
     const handleAddEmoji = (emoji) => {
         setMessage((msg) => msg + emoji.emoji);
@@ -15,16 +24,39 @@ const MessageBar = () => {
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (emojiRef.current && !emojiRef.current.contains(e.target)) {
-                return setIsEmojiPicker(false);
+                setIsEmojiPicker(false);
             }
         };
+        
 
         document.addEventListener("mousedown", handleClickOutside);
 
         return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [emojiRef]);
+    }, [isEmojiPicker]);
 
-    const handleSendMessage = () => {};
+    const handleSendMessage = async () => {
+        if (message.length !== 0) {
+            if (chatType === "contact") {
+                socket.emit("sendMessage", {
+                    sender: userData._id,
+                    recipient: chatData._id,
+                    messageType: "text",
+                    content: message,
+                    fileUrl: undefined,
+                });
+            } else if (chatType === "channel") {
+                socket.emit("sendMessage-channel", {
+                    sender: userData._id,
+                    content: message,
+                    messageType: "text",
+                    fileUrl: undefined,
+                    channelId: chatData._id,
+                });
+            }
+        }
+    
+        setMessage("");
+      };
 
     return (
         <div className="h-[5vh] sm:h-[8vh] z-30 bg-[#1c1d25] flex-center  px-8 mb-2 gap-6">
