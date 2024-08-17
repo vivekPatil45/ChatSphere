@@ -4,6 +4,7 @@ import { io } from "socket.io-client";
 import Cookie from "js-cookie";
 import { selectedUserData } from "@/store/slices/authSlice";
 import { addMessage, selectedChatData, selectedChatMessage, selectedChatType } from "@/store/slices/chatSlice";
+import { setOfflineStatus, setOnlineStatus } from "@/store/slices/usersSlice";
 
 const HOST = "http://localhost:3000";
 const SocketContext = createContext(null);
@@ -19,6 +20,8 @@ const SocketProvider = ({ children }) => {
   const chatType = useSelector(selectedChatMessage);
   const dispatch = useDispatch();
   const cookie = Cookie.get("jwt");
+  // const trigger = useSelector(selectedTrigger);
+
 
   useEffect(() => {
     if (userData) {
@@ -31,8 +34,17 @@ const SocketProvider = ({ children }) => {
         console.log("Connected to socket server");
       });
 
+      socket.current.on("userStatus", ({ userId, status }) => {
+        if (status === "online") {
+          dispatch(setOnlineStatus(userId));
+        } else {
+          dispatch(setOfflineStatus(userId));
+        }
+      });
+
       return () => {
         if (socket.current) {
+          socket.current.off("userStatus");
           socket.current.disconnect();
           console.log("Socket disconnected");
         }

@@ -15,15 +15,24 @@ const setupSocket = (server) =>{
     
     const userSocketMap = new Map();
     const disconnect = (socket) => {
-        console.log("disconnect", socket.id);
+        // console.log("disconnect", socket.id);
     
         for (const [userId, socketId] of userSocketMap.entries()) {
             if (socketId === socket.id) {
+                io.emit("userStatus", { userId, status: "offline" });
+                userSocketMap.forEach((socketId, existingUserId) => {
+                    if (existingUserId !== userId) {
+                        io.to(socket.id).emit("userStatus", {
+                        userId: existingUserId,
+                        status: "offline",
+                        });
+                    }
+                });
                 userSocketMap.delete(userId);
                 break;
             }
         }
-    };
+      };
 
     const sendMessage = async (message) => {
         const senderSocketId = userSocketMap.get(message.sender);
