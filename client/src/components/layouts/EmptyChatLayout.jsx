@@ -1,13 +1,13 @@
 import { animationDefaultOption } from '@/lib/utils'
 import React from 'react'
-import Lottie from 'react-lottie'
+import Lottie2 from 'react-lottie'
 import { Link } from 'react-router-dom'
 
 const EmptyChatLayout = () => {
     return (
         <div className="flex-1 md:bg-template md:flex flex-col justify-center items-center hidden duration-1000 transition-all">
             <Link to={"https://github.com/vivekPatil45"}>
-                <Lottie
+                <Lottie2
                     isClickToPauseDisabled={true}
                     height={200}
                     width={200}

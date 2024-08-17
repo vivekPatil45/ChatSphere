@@ -1,4 +1,7 @@
 import { Server as sockerIOServer } from "socket.io";
+import dotenv from "dotenv";
+dotenv.config();
+
 
 const setupSocket = (server) =>{
     const io = new sockerIOServer(server, {
