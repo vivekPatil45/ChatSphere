@@ -25,6 +25,8 @@ const MessageFragment = () => {
         }
     }, [chatMessages]);
 
+    
+
     const renderMessages = () => {
         let lastDate = null;
     

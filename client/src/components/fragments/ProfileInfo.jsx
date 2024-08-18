@@ -6,6 +6,7 @@ import { Avatar, AvatarImage } from '../ui/avatar';
 import { getColor } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { CirclePower, EditIcon } from 'lucide-react';
+import { setOnlineStatus } from '@/store/slices/usersSlice';
 
 const ProfileInfo = () => {
     const navigate = useNavigate();
@@ -32,7 +33,7 @@ const ProfileInfo = () => {
             });
       
             if (res.ok) {
-                // dispatch(setOnlineStatus({}));
+                dispatch(setOnlineStatus({}));
                 dispatch(setUserData(undefined));
         
                 navigate("/auth");

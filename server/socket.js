@@ -61,7 +61,18 @@ const setupSocket = (server) =>{
     
         if (userId) {
             userSocketMap.set(userId, socket.id);
+            io.emit("userStatus", { userId, status: "online" });
+
             console.log("User connected",userId, socket.id);
+
+            userSocketMap.forEach((socketId, existingUserId) => {
+                if (existingUserId !== userId) {
+                    io.to(socket.id).emit("userStatus", {
+                        userId: existingUserId,
+                        status: "online",
+                    });
+                }
+            });
         } else {
             console.log("userid not provided deuring connectionerror");
         }   

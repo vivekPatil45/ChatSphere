@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 const MessageBar = () => {
     const emojiRef = useRef(null);
     const dispatch = useDispatch();
+    const fileInputRef = useRef(null);
 
     const [message, setMessage] = useState("");
     const [isEmojiPicker, setIsEmojiPicker] = useState(false);
@@ -56,7 +57,13 @@ const MessageBar = () => {
         }
     
         setMessage("");
-      };
+    };
+    const handleAttachmentClick = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
+    const handleAttachmentChange = async(e)=>{}
 
     return (
         <div className="h-[5vh] sm:h-[8vh] z-30 bg-[#1c1d25] flex-center  px-8 mb-2 gap-6">
@@ -68,9 +75,19 @@ const MessageBar = () => {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                 />
-                <button className="text-neutral-500 rounded-sm p-1 focus:border-none focus:outline-none focus:text-white duration-300 transition-all">
+                <button 
+                    className="text-neutral-500 rounded-sm p-1 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
+                    onClick={handleAttachmentClick}
+                >
                     <Paperclip className="w-5 h-5 sm:w-[23px] sm:h-[23px]"  />
                 </button>
+                <input
+                    type="file"
+                    id="file"
+                    className="hidden"
+                    ref={fileInputRef}
+                    onChange={handleAttachmentChange}
+                />
                 <div className="relative">
                     <button
                         onClick={() => setIsEmojiPicker(true)}

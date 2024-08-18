@@ -11,6 +11,8 @@ const MessageHeader = () => {
     const chatData = useSelector((state) => state.chat.chatData);
     const chatType = useSelector((state) => state.chat.chatType);
 
+    const onlineUsers = useSelector((state) => state.users.onlineUsers);
+
     return (
         <div className="h-[10vh] border-b-2 border-[#2f303b] flex items-between py-1 px-4 sm:px-20">
             <div className='flex gap-5 w-full justify-between items-center'>
@@ -51,16 +53,14 @@ const MessageHeader = () => {
                                     ? `${chatData.firstName} ${chatData.lastName}`
                                     : chatData.email}
                                 </span>
-                                <span className="text-xs">
-                                    {chatData.status === false ? "Offline" : "Online"}
-                                </span>
-                                {/* <span className="text-xs mt-1">
+                                
+                                <span className="text-xs mt-1">
                                     {onlineUsers[chatData._id] ? (
                                         <span className="tracking-wide">Online</span>
                                         ) : (
                                         <span className=" tracking-wide">Offline</span>
                                     )}
-                                </span> */}
+                                </span>
                             </div>
                         ) : (
                             <span className="mb-3">{chatData.name}</span>
