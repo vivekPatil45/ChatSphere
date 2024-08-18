@@ -1,8 +1,12 @@
-import { selectedChatData, selectedChatMessage, selectedChatType, setChatMessages } from '@/store/slices/chatSlice';
+import { selectedChatData, selectedChatMessage, selectedChatType, setChatMessages, setFileDownloadingProgress, setIsDownloading } from '@/store/slices/chatSlice';
 import React, { useRef,useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import moment from "moment";
 import { selectedUserData } from '@/store/slices/authSlice';
+import axios from 'axios';
+import ImageModal from './media/ImageModal';
+import { Play } from 'lucide-react';
+import VideoModal from './media/VideoModal';
 
 const MessageFragment = () => {
 
@@ -19,6 +23,8 @@ const MessageFragment = () => {
     const [showMusic, setShowMusic] = useState(false);
     const [musicUrl, setMusicUrl] = useState("");
 
+    console.log(imageUrl);
+    
     console.log(chatMessages);
     
     useEffect(() => {
@@ -77,6 +83,47 @@ const MessageFragment = () => {
             );
         });
     };
+
+    const checkIfImage = (filePath) => {
+        const imageRegex =/\.(jpg|jpeg|png|gif|svg|tif|ico|heif|heic|bmp|webp|tiff)$/i;
+        return imageRegex.test(filePath);
+    };
+    const checkIfVideo = (filePath) => {
+        const videoRegex = /\.(mp4|webm|ogg|avi|mov|wmv|flv|mkv|mpeg|mpg|3gp)$/i;
+        return videoRegex.test(filePath);
+    };
+
+    const handleDownloadFile = async (fileUrl) => {
+        dispatch(setFileDownloadingProgress(0));
+        try {
+            dispatch(setIsDownloading(true));
+            const res = await axios.get(fileUrl, {
+                responseType: "blob",
+                onDownloadProgress: (progressEvent) => {
+                const { loaded, total } = progressEvent;
+        
+                const percentComplated = Math.round((loaded * 100) / total);
+        
+                dispatch(setFileDownloadingProgress(percentComplated));
+                },
+            });
+    
+            const downloadUrl = window.URL.createObjectURL(new Blob([res.data]));
+            const a = document.createElement("a");
+            a.href = downloadUrl;
+            a.download = fileUrl.split("-").pop();
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(downloadUrl);
+        } catch (error) {
+            console.error("There was an error downloading the file:", error);
+        } finally {
+            dispatch(setIsDownloading(false));
+        }
+    };
+    
+
     const renderDmMessages = (message) => (
         <div
             className={`${
@@ -94,7 +141,7 @@ const MessageFragment = () => {
                     {message.content}
                 </div>
             )}
-            {/* {message.messageType === "file" && (
+            {message.messageType === "file" && (
                 <div
                     className={`${
                         message.sender !== chatData._id
@@ -102,92 +149,92 @@ const MessageFragment = () => {
                         : "bg-[#2e2b33]/5 text-white/80 border-[#ffffff]/20"
                     } border inline-block p-4 rounded my-1 max-w-[70%] md:max-w-[100%] lg:max-w-[50%] break-wordss`}
                 >
-                {checkIfImage(message.fileUrl) && (
-                    <div
-                    className="cursor-pointer"
-                    onClick={() => {
-                        setShowImage(true);
-                        setImageUrl(message.fileUrl);
-                    }}
-                    >
-                    <img src={message.fileUrl} height={200} width={200} alt="image" />
-                    </div>
-                )}
-                {checkIfVideo(message.fileUrl) && (
-                    <div
-                    className="relative cursor-pointer"
-                    onClick={() => {
-                        setShowVideo(true);
-                        setVideoUrl(message.fileUrl);
-                    }}
-                    >
-                    <video width={220} height={220}>
-                        <source src={message.fileUrl} type="video/mp4" />
-                    </video>
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                        <Play className="text-white w-5 h-5" />
-                    </div>
-                    </div>
-                )}
-                {checkIfMusic(message.fileUrl) && (
-                    <div
-                    className="relative bg-none flex-center flex-col cursor-pointer"
-                    onClick={() => {
-                        setShowMusic(true);
-                        setMusicUrl(message.fileUrl);
-                    }}
-                    >
-                    <div>
-                        <Music2
-                        className="bg-none text-[#8417ff]"
-                        width={50}
-                        height={50}
-                        />
-                    </div>
-                    <div className="absolute inset-0 flex items-center justify-center  bg-opacity-50">
-                        <Play className="text-white w-5 h-5" />
-                    </div>
-                    <span className="text-sm mt-5">
-                        {message.fileUrl.split("-").pop()}
-                    </span>
-                    </div>
-                )}
+                    {checkIfImage(message.fileUrl) && (
+                        <div
+                            className="cursor-pointer"
+                            onClick={() => {
+                                setShowImage(true);
+                                setImageUrl(message.fileUrl);
+                            }}
+                        >
+                            <img src={message.fileUrl} height={200} width={200} alt="image" />
+                        </div>
+                    )}
+                    {checkIfVideo(message.fileUrl) && (
+                        <div
+                        className="relative cursor-pointer"
+                        onClick={() => {
+                            setShowVideo(true);
+                            setVideoUrl(message.fileUrl);
+                        }}
+                        >
+                        <video width={220} height={220}>
+                            <source src={message.fileUrl} type="video/mp4" />
+                        </video>
+                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                            <Play className="text-white w-5 h-5" />
+                        </div>
+                        </div>
+                    )}
+                    {/* {checkIfMusic(message.fileUrl) && (
+                        <div
+                        className="relative bg-none flex-center flex-col cursor-pointer"
+                        onClick={() => {
+                            setShowMusic(true);
+                            setMusicUrl(message.fileUrl);
+                        }}
+                        >
+                        <div>
+                            <Music2
+                            className="bg-none text-[#8417ff]"
+                            width={50}
+                            height={50}
+                            />
+                        </div>
+                        <div className="absolute inset-0 flex items-center justify-center  bg-opacity-50">
+                            <Play className="text-white w-5 h-5" />
+                        </div>
+                        <span className="text-sm mt-5">
+                            {message.fileUrl.split("-").pop()}
+                        </span>
+                        </div>
+                    )} */}
         
-                {checkIfDocument(message.fileUrl) && (
-                    <div className="flex items-center justify-center gap-4">
-                    <span className="text-white/8- text-3xl bg-black/20 rounded-full p-2">
-                        <FileText height={16} width={16} />
-                    </span>
-                    <span className="text-sm">
-                        {message.fileUrl.split("-").pop()}
-                    </span>
-                    <span
-                        onClick={() => handleDownloadFile(message.fileUrl)}
-                        className="bg-black/20 p-2  rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
-                    >
-                        <Download height={16} width={16} />
-                    </span>
-                    </div>
-                )}
+                    {/* {checkIfDocument(message.fileUrl) && (
+                        <div className="flex items-center justify-center gap-4">
+                        <span className="text-white/8- text-3xl bg-black/20 rounded-full p-2">
+                            <FileText height={16} width={16} />
+                        </span>
+                        <span className="text-sm">
+                            {message.fileUrl.split("-").pop()}
+                        </span>
+                        <span
+                            onClick={() => handleDownloadFile(message.fileUrl)}
+                            className="bg-black/20 p-2  rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
+                        >
+                            <Download height={16} width={16} />
+                        </span>
+                        </div>
+                    )} */}
         
-                {checkIfArchive(message.fileUrl) && (
-                    <div className="flex items-center justify-center gap-4">
-                    <span className="text-white/8- text-3xl bg-black/20 rounded-full p-3">
-                        <FileArchive height={16} width={16} />
-                    </span>
-                    <span className="text-sm">
-                        {message.fileUrl.split("-").pop()}
-                    </span>
-                    <span
-                        onClick={() => handleDownloadFile(message.fileUrl)}
-                        className="bg-black/20 p-2 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
-                    >
-                        <Download height={16} width={16} />
-                    </span>
-                    </div>
-                )}
+                    {/* {checkIfArchive(message.fileUrl) && (
+                        <div className="flex items-center justify-center gap-4">
+                        <span className="text-white/8- text-3xl bg-black/20 rounded-full p-3">
+                            <FileArchive height={16} width={16} />
+                        </span>
+                        <span className="text-sm">
+                            {message.fileUrl.split("-").pop()}
+                        </span>
+                        <span
+                            onClick={() => handleDownloadFile(message.fileUrl)}
+                            className="bg-black/20 p-2 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
+                        >
+                            <Download height={16} width={16} />
+                        </span>
+                        </div>
+                    )} */}
                 </div>
-            )} */}
+            )}
     
             <div className="text-xs text-gray-600">
                 {moment(message.timeStamp).format("LT")}
@@ -201,6 +248,22 @@ const MessageFragment = () => {
             ref={fragmentRef}
         >
             {renderMessages()}
+            {showImage && (
+                <ImageModal
+                    setShowImage={setShowImage}
+                    setImageUrl={setImageUrl}
+                    imageUrl={imageUrl}
+                    handleDownloadFile={handleDownloadFile}
+                />
+            )}
+            {showVideo && (
+            <VideoModal
+                setShowVideo={setShowVideo}
+                videoUrl={videoUrl}
+                handleDownloadFile={handleDownloadFile}
+                setVideoUrl={setVideoUrl}
+            />
+      )}
         </div>
     )
 }
