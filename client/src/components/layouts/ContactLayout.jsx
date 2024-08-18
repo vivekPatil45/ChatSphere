@@ -6,6 +6,7 @@ import NewDm from '../fragments/NewDm';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectedDirectMessageContacts, setDirectMessagerContact } from '@/store/slices/chatSlice';
 import ContactList from '../fragments/ContactList';
+import Channel from '../fragments/Channel';
 
 const ContactLayout = () => {
 
@@ -59,6 +60,7 @@ const ContactLayout = () => {
             <div className='my-5'>
                 <div className="flex-between pr-10">
                     <Title text="Channel" />
+                    <Channel />
                 </div>
             </div>
 
