@@ -8,6 +8,9 @@ import ImageModal from './media/ImageModal';
 import { Download, FileArchive, FileText, Music2, Play } from 'lucide-react';
 import VideoModal from './media/VideoModal';
 import MusicModal from './media/MusicModal';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { getColor } from '@/lib/utils';
+import { splitName } from './NewDm';
 
 const MessageFragment = () => {
 
@@ -267,8 +270,157 @@ const MessageFragment = () => {
     );
     
     const renderChannelMessages = (message) => {
+        return (
+            <div
+                className={`mt-5 ${
+                message.sender._id !== userData._id ? "text-left" : "text-right"
+                }`}
+            >
+                {message.messageType === "text" && (
+                <div
+                    className={`${
+                    message.sender !== chatData._id
+                        ? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]/50"
+                        : "bg-[#2e2b33]/5 text-white/80 border-[#ffffff]/20"
+                    } border wore inline-block p-2.5 text-sm rounded my-1 max-w-[50%] break-wordss `}
+                >
+                    {message.content}
+                </div>
+                )}
+                {message.messageType === "file" && (
+                <div
+                    className={`${
+                    message.sender._id !== userData._id
+                        ? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]/50"
+                        : "bg-[#2e2b33]/5 text-white/80 border-[#ffffff]/20"
+                    } border inline-block p-4 rounded my-1 max-w-[70%] md:max-w-[100%] lg:max-w-[50%] break-wordss`}
+                >
+                    {checkIfImage(message.fileUrl) && (
+                    <div
+                        className="cursor-pointer"
+                        onClick={() => {
+                        setShowImage(true);
+                        setImageUrl(message.fileUrl);
+                        }}
+                    >
+                        <img
+                        src={message.fileUrl}
+                        height={200}
+                        width={200}
+                        alt="image"
+                        />
+                    </div>
+                    )}
+                    {checkIfVideo(message.fileUrl) && (
+                    <div
+                        className="relative cursor-pointer"
+                        onClick={() => {
+                        setShowVideo(true);
+                        setVideoUrl(message.fileUrl);
+                        }}
+                    >
+                        <video width={220} height={220}>
+                        <source src={message.fileUrl} type="video/mp4" />
+                        </video>
+                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                        <Play className="text-white w-5 h-5" />
+                        </div>
+                    </div>
+                    )}
+                    {checkIfMusic(message.fileUrl) && (
+                    <div
+                        className="relative bg-none flex-center flex-col cursor-pointer"
+                        onClick={() => {
+                        setShowMusic(true);
+                        setMusicUrl(message.fileUrl);
+                        }}
+                    >
+                        <div>
+                        <Music2
+                            className="bg-none text-[#8417ff]"
+                            width={50}
+                            height={50}
+                        />
+                        </div>
+                        <div className="absolute inset-0 flex items-center justify-center  bg-opacity-50">
+                        <Play className="text-white w-5 h-5" />
+                        </div>
+                        <span className="text-sm mt-5">
+                        {message.fileUrl.split("-").pop()}
+                        </span>
+                    </div>
+                    )}
+        
+                    {checkIfDocument(message.fileUrl) && (
+                    <div className="flex items-center justify-center gap-4">
+                        <span className="text-white/8- text-3xl bg-black/20 rounded-full p-3">
+                        <FileText height={16} width={16} />
+                        </span>
+                        <span className="text-sm">
+                        {message.fileUrl.split("-").pop()}
+                        </span>
+                        <span
+                        onClick={() => handleDownloadFile(message.fileUrl)}
+                        className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
+                        >
+                        <Download height={16} width={16} />
+                        </span>
+                    </div>
+                    )}
+        
+                    {checkIfArchive(message.fileUrl) && (
+                    <div className="flex items-center justify-center gap-4">
+                        <span className="text-white/8- text-3xl bg-black/20 rounded-full p-3">
+                        <FileArchive height={16} width={16} />
+                        </span>
+                        <span className="text-sm">
+                        {message.fileUrl.split("-").pop()}
+                        </span>
+                        <span
+                        onClick={() => handleDownloadFile(message.fileUrl)}
+                        className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
+                        >
+                        <Download height={16} width={16} />
+                        </span>
+                    </div>
+                    )}
+                </div>
+                )}
+                {message.sender._id !== userData._id ? (
+                <div className="flex items-center mt-1 justify-start gap-3">
+                    <Avatar className="w-8 h-8 ">
+                    {message.sender.image && (
+                        <AvatarImage
+                        src={message.sender.image}
+                        alt="profile"
+                        className="object-cover w-full rounded-full h-full bg-black"
+                        loading="lazy"
+                        />
+                    )}
+                    <AvatarFallback
+                        className={`uppercase h-8 w-8 flex-center text-xs  flex-center rounded-full ${getColor(
+                        message.sender.color
+                        )}`}
+                    >
+                        {message.sender.firstName && message.sender.lastName
+                        && splitName(message.sender.firstName, message.sender.lastName)}
+                        
+                    </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm text-white/60">{`${message.sender.firstName} ${message.sender.lastName}`}</span>
+                    <span className="text-xs text-white/60">
+                    {moment(message.timeStamp).format("LT")}
+                    </span>
+                </div>
+                ) : (
+                <span className="text-xs block text-white/60 mt-1">
+                    {moment(message.timeStamp).format("LT")}
+                </span>
+                )}
+            </div>
+        );
+    };
 
-    }
     return (
         <div 
             className="flex-1 overflow-y-auto p-4 px-8 md:w-[65vw] lg:w-[70vw] xl:w-[80vw] w-full"

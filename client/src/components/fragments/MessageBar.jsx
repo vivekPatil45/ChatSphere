@@ -60,6 +60,8 @@ const MessageBar = () => {
     
         setMessage("");
     };
+    
+
     const handleAttachmentClick = () => {
         if (fileInputRef.current) {
             fileInputRef.current.click();

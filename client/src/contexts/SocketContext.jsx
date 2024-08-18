@@ -58,8 +58,8 @@ const SocketProvider = ({ children }) => {
 
 
       socket.current.on("newChannel", (channel) => {
-        dispatch(addChannel(channel));
-        dispatch(setTrigger());
+          dispatch(addChannel(channel));
+          dispatch(setTrigger());
       });
       socket.current.on("dm-created", (message) => {
         dispatch(addChannelInChannelList(message));
@@ -86,14 +86,31 @@ const SocketProvider = ({ children }) => {
         ) {
           dispatch(addMessage(message));
         }
-        // dispatch(addContactInDmContactList({ userId: userData._id, message }));
+        dispatch(addContactInDmContactList({ userId: userData._id, message }));
 
+      };
+
+      const handleReceiveChannelMessage = (message) => {
+        if (
+          selectedChatType !== undefined &&
+          chatData._id === message.channelId
+        ) {
+          dispatch(addMessage(message));
+        }
+        dispatch(addChannelInChannelList(message));
+        dispatch(setTrigger());
       };
       
       socket.current.on("receiveMessage", handleMessage);
+      socket.current.on("receive-channel-message", handleReceiveChannelMessage);
+
       return () => {
         socket.current.off("receiveMessage", handleMessage);
-        
+        socket.current.off("channelCreated");
+        socket.current.off(
+          "receive-channel-message",
+          handleReceiveChannelMessage
+        );
       };
     }
 

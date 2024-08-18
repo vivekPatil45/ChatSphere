@@ -6,6 +6,7 @@ dotenv.config();
 
 
 const setupSocket = (server) =>{
+
     const io = new sockerIOServer(server, {
         cors: {
             origin: process.env.ORIGIN,
@@ -15,6 +16,7 @@ const setupSocket = (server) =>{
     });
     
     const userSocketMap = new Map();
+
     const disconnect = (socket) => {
         console.log("disconnect", socket.id);
     
@@ -62,7 +64,7 @@ const setupSocket = (server) =>{
         const { channelId, sender, content, messageType, fileUrl } = message;
     
         try {
-          
+
         
             const createdMessage = await Message.create({
                 sender,
@@ -145,7 +147,11 @@ const setupSocket = (server) =>{
                     });
                 }
             });
-            socket.on("sendMessage",sendMessage);
+
+            socket.on("channelCreated", sendChannel);
+
+            socket.on("sendMessage", sendMessage);
+            socket.on("sendMessage-channel", sendMessageChannel);
             socket.on("disconnect", () => disconnect(socket));
         } else {
             console.log("userid not provided deuring connectionerror");
