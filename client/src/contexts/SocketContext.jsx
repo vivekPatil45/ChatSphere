@@ -3,7 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { io } from "socket.io-client";
 import Cookie from "js-cookie";
 import { selectedUserData } from "@/store/slices/authSlice";
-import { addMessage, selectedChatData, selectedChatMessage, selectedChatType } from "@/store/slices/chatSlice";
+import { 
+  addMessage, 
+  selectedChatData, 
+  selectedChatMessage, 
+  selectedChatType 
+} from "@/store/slices/chatSlice";
 import { setOfflineStatus, setOnlineStatus } from "@/store/slices/usersSlice";
 
 const HOST = "http://localhost:3000";
@@ -16,12 +21,17 @@ const SocketProvider = ({ children }) => {
   const socket = useRef();
   const userData = useSelector(selectedUserData);
   const chatData = useSelector(selectedChatData);
-  const chatMessage = useSelector(selectedChatType);
-  const chatType = useSelector(selectedChatMessage);
+  const chatMessage = useSelector(selectedChatMessage);
+  const chatType = useSelector(selectedChatType);
   const dispatch = useDispatch();
   const cookie = Cookie.get("jwt");
   // const trigger = useSelector(selectedTrigger);
+  console.log(chatMessage);
+  console.log("reciver",chatData);
 
+  console.log("sender",userData);
+
+  
 
   useEffect(() => {
     if (userData) {
