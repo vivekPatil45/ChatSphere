@@ -1,7 +1,7 @@
 import { Server as sockerIOServer } from "socket.io";
-import dotenv from "dotenv";
 import Message from "./src/models/message.model.js";
 import Channel from "./src/models/channel.model.js"
+import dotenv from "dotenv";
 dotenv.config();
 
 

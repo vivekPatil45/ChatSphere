@@ -2,10 +2,12 @@ import mongoose from "mongoose";
 import { errorHandler } from "../utils/error.js";
 import Channel from "../models/channel.model.js";
 import User from "../models/user.model.js";
+
+
 export const createChannels = async (req, res, next) => {
     try {
         const { name, members } = req.body;
-        console.log("Received members:", members); // Log received members
+        // console.log("Received members:", members); // Log received members
 
         const userId = req.userId;
 
