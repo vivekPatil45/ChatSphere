@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { 
     TooltipProvider,
     Tooltip,
@@ -19,6 +19,7 @@ import { useSocket } from '@/contexts/SocketContext';
 import { toast } from 'sonner';
 import MultipleSelector from '../ui/multipleselect';
 import { Input } from '../ui/input';
+import { addChannel, setTrigger } from '@/store/slices/chatSlice';
 
 export const splitName = (firstName, lastName) => {
     const result = [];
@@ -40,8 +41,12 @@ const Channel = () => {
     const [allContact, setAllContact] = useState([]);
     const [channelName, setChannelName] = useState("");
     
+    console.log();
+    
+
+
     useEffect(() => {
-        // dispatch(setTrigger(true));
+        dispatch(setTrigger(true));
         const getData = async () => {
             try {
                 const res = await fetch("/api/contacts/get-all-contacts", {
@@ -64,9 +69,56 @@ const Channel = () => {
     
         getData();
     }, []);
-    const handleCreateChannel = async () =>{
 
+    const handleCreateChannel = async () => {
+        console.log("Selected Contacts:", selectedContacts); // Should show { label: 'user patil', value: 'userId' }
+        const members = selectedContacts.map(contact => contact.value);
+        // Ensure members contains valid IDs
+        if (members.includes(null) || members.includes(undefined)) {
+            toast.error("Invalid members selected.");
+            return;
+        }
+        try {
+        if (channelName.length > 0 && selectedContacts.length > 0) {
+            // Ensure no null values in selectedContacts
+            const validSelectedContacts = selectedContacts.filter(contact => contact !== null);
+
+            if (validSelectedContacts.length === 0) {
+                toast.error("Please select valid contacts.");
+                return;
+            }
+
+            const res = await fetch("/api/channel/create-channel", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: channelName,
+                    members: validSelectedContacts.map(contact => contact.value),
+                }),
+                credentials: "include",
+            });
+
+            const data = await res.json();
+            console.log(data);
+
+            if (!res.ok) {
+                toast.error(data.message);
+                throw new Error(data.errors);
+            } else {
+                socket.emit("channelCreated", data.channel);
+                dispatch(addChannel(data.channel));
+                setChannelName("");
+                setSelectedContacts([]);
+                setNewChannelModal(false);
+            }
+        }
+        } catch (error) {
+            toast.error(error.message);
+        }
     }
+
 
     return (
         <>
@@ -74,7 +126,7 @@ const Channel = () => {
                 <Tooltip>
                     <TooltipTrigger>
                         <Plus
-                            onClick={() => setNewChannelModal(true)}
+                            onClick={() => {setNewChannelModal(true);   }}
                             className="text-neutral-400 font-light text-opacity-90 text-start hover:text-neutral-100 cursor-pointer transition-all duration-300"
                         />
                     </TooltipTrigger>
@@ -87,9 +139,9 @@ const Channel = () => {
                 <ResponsiveModalContent className="bg-[#181920] border-none  text-white w-full md:max-w-[500px] min-h-[400px] flex flex-col">
                     <ResponsiveModalHeader>
                         <ResponsiveModalTitle
-                        className={"text-center mb-1 space-y-1 text-white"}
+                            className={"text-center mb-1 space-y-1 text-white"}
                         >
-                        Please fill up the details for new channel.
+                            Please fill up the details for new channel.
                         </ResponsiveModalTitle>
                         <ResponsiveModalDescription></ResponsiveModalDescription>
                     </ResponsiveModalHeader>
@@ -107,7 +159,14 @@ const Channel = () => {
                             defaultOptions={allContact}
                             placeholder="Search Contacts..."
                             value={selectedContacts}
-                            onChange={setSelectedContacts}
+                            // onChange={(selected) => {
+                            //     const formattedContacts = selected.map(contact => ({
+                            //         label: contact.label, // User-friendly name
+                            //         value: contact.value, // User ID
+                            //     }));
+                            //     setSelectedContacts(formattedContacts);
+                            // }}
+                            onChange={setSelectedContacts  }
                             emptyIndicator={
                                 <p className="text-center text-lg leading-6 text-gray-600">
                                 No result found.

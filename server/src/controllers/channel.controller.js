@@ -2,27 +2,21 @@ import mongoose from "mongoose";
 import { errorHandler } from "../utils/error.js";
 import Channel from "../models/channel.model.js";
 import User from "../models/user.model.js";
-
 export const createChannels = async (req, res, next) => {
     try {
         const { name, members } = req.body;
+        console.log("Received members:", members); // Log received members
+
         const userId = req.userId;
 
         if (!name || !members || !Array.isArray(members) || members.length === 0) {
-            return next(errorHandler(
-                400,
-                "Invalid input: name and members are required."
-            ));
-        }
-
-        const admin = await User.findById(userId);
-        if (!admin) {
-            return next(errorHandler(400, "Admin user not found."));
+            return next(errorHandler(400, "Invalid input: name and members are required."));
         }
 
         const validMembers = await User.find({ _id: { $in: members } });
+        console.log("Valid members found:", validMembers.map(member => member._id)); // Log valid members
+
         if (validMembers.length !== members.length) {
-            
             return next(errorHandler(400, "Some members are not valid users."));
         }
 
@@ -44,6 +38,8 @@ export const createChannels = async (req, res, next) => {
         next(error);
     }
 };
+
+  
 
 export const getChannels = async (req, res, next) => {
     try {

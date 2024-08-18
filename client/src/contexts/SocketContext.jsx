@@ -4,10 +4,14 @@ import { io } from "socket.io-client";
 import Cookie from "js-cookie";
 import { selectedUserData } from "@/store/slices/authSlice";
 import { 
+  addChannel,
+  addChannelInChannelList,
   addMessage, 
   selectedChatData, 
   selectedChatMessage, 
-  selectedChatType 
+  selectedChatType, 
+  selectedTrigger,
+  setTrigger
 } from "@/store/slices/chatSlice";
 import { setOfflineStatus, setOnlineStatus } from "@/store/slices/usersSlice";
 
@@ -25,7 +29,7 @@ const SocketProvider = ({ children }) => {
   const chatType = useSelector(selectedChatType);
   const dispatch = useDispatch();
   const cookie = Cookie.get("jwt");
-  // const trigger = useSelector(selectedTrigger);
+  const trigger = useSelector(selectedTrigger);
   console.log(chatMessage);
   console.log("reciver",chatData);
 
@@ -52,8 +56,18 @@ const SocketProvider = ({ children }) => {
         }
       });
 
+
+      socket.current.on("newChannel", (channel) => {
+        dispatch(addChannel(channel));
+        dispatch(setTrigger());
+      });
+      socket.current.on("dm-created", (message) => {
+        dispatch(addChannelInChannelList(message));
+        dispatch(setTrigger());
+      });
       return () => {
         if (socket.current) {
+          socket.current.off("newChannel");
           socket.current.off("userStatus");
           socket.current.disconnect();
           console.log("Socket disconnected");
@@ -85,6 +99,7 @@ const SocketProvider = ({ children }) => {
 
 
   },[chatData,chatType,chatMessage])
+
   return (
     <SocketContext.Provider value={socket.current}>
       {children}
