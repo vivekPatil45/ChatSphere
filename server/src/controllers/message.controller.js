@@ -1,4 +1,5 @@
 import Message from "../models/message.model.js";
+import { errorHandler } from "../utils/error.js";
 
 export const getMessage = async (req, res, next) => {
     try {
@@ -6,7 +7,7 @@ export const getMessage = async (req, res, next) => {
         const user2 = req.body.id;
 
         if (!user1 || !user2) {
-            throw new ResponseError(400).json("Both user Id's are required");
+            return  next(errorHandler(400,"Both user Id's are required"));
         }
 
         const messages = await Message.find({
