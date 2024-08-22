@@ -7,8 +7,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
-        secure: false,
+        target: 'https://chatsphere-7tox.onrender.com',
+        secure: true,
       },
     },
   },
