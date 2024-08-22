@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import Background from "../assets/login1.png";
-import victory from "../assets/victory.svg";
 import { Tabs, TabsList,TabsContent,TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';

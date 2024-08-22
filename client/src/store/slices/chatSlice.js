@@ -12,6 +12,7 @@ const initialState = {
     channels: [],
     trigger: 1,
 };
+
 const chatSlice = createSlice({
     name: "chat",
     initialState,
