@@ -82,6 +82,10 @@ const connectDB = async () => {
     }
 };
 
+app.get('*', (req, res) => {
+  res.status(404).json({ message: 'API route not found' });
+});
+
 const server = app.listen(PORT, () => {
     connectDB();
 
