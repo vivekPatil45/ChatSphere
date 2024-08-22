@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
 const MessageBar = () => {
+    const API_URL = import.meta.env.VITE_API_URL;
     const emojiRef = useRef(null);
     const dispatch = useDispatch();
     const fileInputRef = useRef(null);
@@ -83,7 +84,7 @@ const MessageBar = () => {
             formData.append("file", file);
     
             try {
-                const res = await axios.post("/api/messages/upload-file",
+                const res = await axios.post(`${API_URL}/api/messages/upload-file`,
                     formData,
                     {
                         withCredentials: true,

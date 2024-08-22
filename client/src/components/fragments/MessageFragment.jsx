@@ -13,7 +13,7 @@ import { getColor } from '@/lib/utils';
 import { splitName } from './NewDm';
 
 const MessageFragment = () => {
-
+    const API_URL = import.meta.env.VITE_API_URL;
     const fragmentRef = useRef();
     const dispatch = useDispatch();
     const chatMessages = useSelector(selectedChatMessage);
@@ -40,7 +40,7 @@ const MessageFragment = () => {
     useEffect(() => {
         const getMessages = async () => {
             try {
-                const res = await fetch("/api/messages/get-messages", {
+                const res = await fetch(`${API_URL}/api/messages/get-messages`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -61,7 +61,25 @@ const MessageFragment = () => {
         };
     
         const getChannelMessage = async ()=>{
-
+            try {
+                const res = await fetch(
+                  `${API_URL}/api/channel/get-channel-messages/` + chatData._id,
+                    {
+                        method: "GET",
+                        credentials: "include",
+                    }
+                );
+                const data = await res.json();
+        
+                if (res.ok) {
+                    dispatch(setChatMessages(data.messages));
+                }else{
+                    throw new Error(data.errors)
+                }
+            } catch (error) {
+            toast.error(error.message);
+            }
+        
         }
 
         if (chatData._id) {

@@ -34,6 +34,7 @@ export const splitName = (firstName, lastName) => {
 };
 
 const Channel = () => {
+    const API_URL = import.meta.env.VITE_API_URL;
     const dispatch = useDispatch();
     const socket = useSocket();
     const [newChannelModal, setNewChannelModal] = useState(false);
@@ -49,7 +50,7 @@ const Channel = () => {
         dispatch(setTrigger(true));
         const getData = async () => {
             try {
-                const res = await fetch("/api/contacts/get-all-contacts", {
+                const res = await fetch(`${API_URL}/api/contacts/get-all-contacts`, {
                 method: "GET",
                 credentials: "include",
                 });

@@ -15,7 +15,7 @@ import {
 } from "@/store/slices/chatSlice";
 import { setOfflineStatus, setOnlineStatus } from "@/store/slices/usersSlice";
 
-const HOST = "http://localhost:3000";
+const HOST = import.meta.env.VITE_API_URL;
 const SocketContext = createContext(null);
 
 export const useSocket = () => useContext(SocketContext);

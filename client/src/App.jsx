@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setUserData ,selectedUserData} from './store/slices/authSlice'
 
 const App = () => {
+  const API_URL = import.meta.env.VITE_API_URL;
   const userData = useSelector(selectedUserData);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
@@ -14,7 +15,7 @@ const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("/api/auth/user-data", {
+        const res = await fetch(`${API_URL}/api/auth/user-data`, {
           methods: "GET",
           credentials: "include",
         });

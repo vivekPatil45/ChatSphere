@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const Profile = () => {
+    const API_URL = import.meta.env.VITE_API_URL;
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const userData = useSelector(selectedUserData);
@@ -47,7 +48,7 @@ const Profile = () => {
     const handleSaveChange = async () =>{
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/update-profile", {
+            const res = await fetch(`${API_URL}/api/auth/update-profile`, {
                 method: "POST",
                 headers: {
                 "Content-Type": "application/json",
@@ -83,7 +84,7 @@ const Profile = () => {
             formData.append("profile-image", file);
 
             try {
-                const res = await fetch("/api/auth/add-profile-image", {
+                const res = await fetch(`${API_URL}/api/auth/add-profile-image`, {
                     method: "POST",
                     body: formData,
                     credentials: "include",
@@ -106,7 +107,7 @@ const Profile = () => {
     const handleDeleteImage = async () =>{
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/remove-profile-image", {
+            const res = await fetch(`${API_URL}/api/auth/remove-profile-image`, {
                 method: "DELETE",
                 credentials: "include",
             });

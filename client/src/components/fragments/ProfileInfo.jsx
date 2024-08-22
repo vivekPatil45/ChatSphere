@@ -9,6 +9,7 @@ import { CirclePower, EditIcon } from 'lucide-react';
 import { setOnlineStatus } from '@/store/slices/usersSlice';
 
 const ProfileInfo = () => {
+    const API_URL = import.meta.env.VITE_API_URL;
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const userData = useSelector(selectedUserData);
@@ -27,7 +28,7 @@ const ProfileInfo = () => {
 
     const handleLogout = async () => {
         try {
-            const res = await fetch("/api/auth/logout", {
+            const res = await fetch(`${API_URL}/api/auth/logout`, {
                 method: "POST",
                 credentials: "include",
             });

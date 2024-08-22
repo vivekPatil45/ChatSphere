@@ -37,6 +37,7 @@ export const splitName = (firstName, lastName) => {
 };
 
 const NewDm = () => {
+    const API_URL = import.meta.env.VITE_API_URL;
     const dispatch = useDispatch();
 
     const [openNewContactModal, setOpenNewContactModal] = useState(false);
@@ -50,7 +51,7 @@ const NewDm = () => {
     useEffect(()=>{
         const fetchData = async () => {
             try {
-                const res = await fetch("/api/contacts/search", {
+                const res = await fetch(`${API_URL}/api/contacts/search`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

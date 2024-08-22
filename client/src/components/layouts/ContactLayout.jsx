@@ -11,7 +11,7 @@ import { selectedUserData, setUserData } from '@/store/slices/authSlice';
 import { toast } from 'sonner';
 
 const ContactLayout = () => {
-
+    const API_URL = import.meta.env.VITE_API_URL;
     const directMessageContaacts = useSelector(selectedDirectMessageContacts);
     const dispatch = useDispatch();
     const channel = useSelector(selectedChannels);
@@ -25,7 +25,7 @@ const ContactLayout = () => {
                 dispatch(setDirectMessagerContact(contactLS));
             }
             try {
-                const res = await fetch("/api/contacts/get-contact-for-dm", {
+                const res = await fetch(`${API_URL}/api/contacts/get-contact-for-dm`, {
                     method: "GET",
                     credentials: "include",
                 });
@@ -52,7 +52,7 @@ const ContactLayout = () => {
                 dispatch(setChannel(channelLS));
             }
             try {
-                const res = await fetch("/api/channel/get-channel", {
+                const res = await fetch(`${API_URL}/api/channel/get-channel`, {
                     method: "GET",
                     credentials: "include",
                 });
