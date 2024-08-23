@@ -8,6 +8,8 @@ import { setUserData ,selectedUserData} from './store/slices/authSlice'
 
 const App = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  console.log(API_URL);
+  
   const userData = useSelector(selectedUserData);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
