@@ -81,13 +81,20 @@ export const login = async (req, res, next) => {
         if (!isMatch) {
             return next(errorHandler(400, "Invalid password"));
         }
-  
+
         res.cookie("jwt", createToken(email, user._id), {
-            maxAge: maxAge,
+x            maxAge,
             httpOnly: true,
             secure: true,
-            sameSite: "none",
+            sameSite: "None",
         });
+  
+        // res.cookie("jwt", createToken(email, user._id), {
+        //     maxAge: maxAge,
+        //     httpOnly: true,
+        //     secure: true,
+        //     sameSite: "none",
+        // });
   
         const {
             _id,
@@ -98,7 +105,8 @@ export const login = async (req, res, next) => {
             image,
             color,
         } = user._doc;
-  
+        
+        
         return res.status(200).json({
             success: true,
             message: "Login Successfully",

@@ -18,7 +18,7 @@ const App = () => {
     const fetchData = async () => {
       try {
         const res = await fetch(`${API_URL}/api/auth/user-data`, {
-          methods: "GET",
+          method: "GET",
           credentials: "include",
         });
 
