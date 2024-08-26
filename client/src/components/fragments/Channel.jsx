@@ -89,7 +89,7 @@ const Channel = () => {
                 return;
             }
 
-            const res = await fetch("/api/channel/create-channel", {
+            const res = await fetch(`${API_URL}/api/channel/create-channel`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
